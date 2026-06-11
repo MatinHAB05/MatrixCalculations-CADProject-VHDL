@@ -58,20 +58,20 @@ BEGIN
   END PROCESS;
 
   PROCESS
-    FILE FIN_A   : text OPEN read_mode IS "A.txt";
-    FILE FIN_B   : text OPEN read_mode IS "B.txt";
-    FILE FOUT    : text OPEN write_mode IS "AB.txt";
+    FILE FIN_A : text OPEN read_mode IS "A.txt";
+    FILE FIN_B : text OPEN read_mode IS "B.txt";
+    FILE FOUT : text OPEN write_mode IS "AB.txt";
     FILE FIN_EXP : text OPEN read_mode IS "AB_testcase.txt";
-    FILE FLOG    : text OPEN write_mode IS "sim_log.txt"; -- New log file
+    FILE FLOG : text OPEN write_mode IS "sim_log.txt"; -- New log file
 
-    VARIABLE L     : line;
+    VARIABLE L : line;
     VARIABLE L_log : line; -- New separate line buffer for logs
-    
-    VARIABLE val_exp   : INTEGER;
-    VARIABLE val_act   : INTEGER;
+
+    VARIABLE val_exp : INTEGER;
+    VARIABLE val_act : INTEGER;
     VARIABLE error_cnt : INTEGER := 0;
 
-    VARIABLE addr    : INTEGER;
+    VARIABLE addr : INTEGER;
     VARIABLE valA, valB : INTEGER;
     VARIABLE line_in : LINE;
     VARIABLE line_exp : LINE;
@@ -122,7 +122,7 @@ BEGIN
 
     -- Read Results, Log to File, and Verify
     re <= '1';
-    
+
     -- NOTE: If your "AB_testcase.txt" has all 1024 integers on ONE single line 
     -- instead of 1 integer per line, uncomment the next line:
     -- readline(FIN_EXP, line_exp);
@@ -131,16 +131,16 @@ BEGIN
       FOR col IN 0 TO 31 LOOP
         addr := row * 32 + col;
         raddr <= STD_LOGIC_VECTOR(to_unsigned(addr, 10));
-        
+
         -- Wait for memory read latency
         WAIT UNTIL rising_edge(clk);
         WAIT UNTIL rising_edge(clk);
-        WAIT FOR 1 ns; 
-        
+        WAIT FOR 1 ns;
+
         -- 1. Read Expected Value from testcase file
-        readline(FIN_EXP, line_exp); 
+        readline(FIN_EXP, line_exp);
         read(line_exp, val_exp);
-        
+
         -- 2. Grab Actual Value from design output
         val_act := to_integer(signed(rdata));
 
@@ -152,7 +152,7 @@ BEGIN
         write(L, STRING'(") = "));
         write(L, val_act);
         writeline(FOUT, L);
-        
+
         -- 4. Compare and Write detailed logs to sim_log.txt
         IF val_act = val_exp THEN
           write(L_log, STRING'("SUCCESS: C( "));
@@ -175,19 +175,17 @@ BEGIN
           error_cnt := error_cnt + 1;
         END IF;
 
-        END LOOP;
+      END LOOP;
     END LOOP;
-
-
     re <= '0';
-    
+
     -- Write Final Summary into the Log File
     write(L_log, STRING'("=============================================="));
     writeline(FLOG, L_log);
     IF error_cnt = 0 THEN
       write(L_log, STRING'("FINAL STATUS: PASSED (All 1024 points match!)"));
       writeline(FLOG, L_log);
-      
+
       -- Keep a single clean assertion in the console just to stop the simulation gracefully
       ASSERT false REPORT "Simulation Finished Successfully: 0 Errors. Check sim_log.txt for full matrix dump." SEVERITY failure;
     ELSE
@@ -195,7 +193,7 @@ BEGIN
       write(L_log, error_cnt);
       write(L_log, STRING'(" errors."));
       writeline(FLOG, L_log);
-      
+
       ASSERT false REPORT "Simulation Completed with " & INTEGER'image(error_cnt) & " ERRORS. Check sim_log.txt to debug mismatches." SEVERITY failure;
     END IF;
 

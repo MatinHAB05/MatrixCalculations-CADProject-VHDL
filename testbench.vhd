@@ -59,9 +59,9 @@ BEGIN
 
   PROCESS
     VARIABLE L : line;
-    FILE FIN_A : text OPEN read_mode IS "a.txt";
-    FILE FIN_B : text OPEN read_mode IS "b.txt";
-    FILE FOUT : text OPEN write_mode IS "MatrixC.txt";
+    FILE FIN_A : text OPEN read_mode IS "A.txt";
+    FILE FIN_B : text OPEN read_mode IS "B.txt";
+    FILE FOUT : text OPEN write_mode IS "AB.txt";
     VARIABLE addr : INTEGER;
     VARIABLE valA, valB : INTEGER;
     VARIABLE line_in : LINE;

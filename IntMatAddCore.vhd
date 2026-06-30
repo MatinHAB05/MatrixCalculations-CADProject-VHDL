@@ -42,8 +42,8 @@ ARCHITECTURE rtl OF IntMatAddCore IS
         );
     END COMPONENT;
 
-    -- Control FSM States (nextState is removed)
-    TYPE stateType IS (stIdle, stWriteBufferA, stWriteBufferB, stComputeSub, stWaitLast, stComplete);
+    -- Control FSM States
+    TYPE stateType IS (stIdle, stWriteBufferA, stWriteBufferB, stComputeAdd, stWaitLast, stComplete);
     SIGNAL presState : stateType := stIdle;
 
     -- Core Internal Signals
@@ -67,7 +67,7 @@ BEGIN
     iWriteEnableA(0) <= WriteEnable AND BufferSel;
     iWriteEnableB(0) <= WriteEnable AND (NOT BufferSel);
 
-    ram_enb_q <= '1' WHEN (presState = stComputeSub) ELSE
+    ram_enb_q <= '1' WHEN (presState = stComputeAdd) ELSE
         '0';
 
     ----------------------------------------------------------------
@@ -144,16 +144,16 @@ BEGIN
                         IF WriteEnable = '0' THEN
                             iCount <= (OTHERS => '0');
                             pipe_valid <= "00";
-                            presState <= stComputeSub;
+                            presState <= stComputeAdd;
                         END IF;
 
-                    WHEN stComputeSub =>
+                    WHEN stComputeAdd =>
                         -- Pipeline Address Progression Tracking
                         addr_pipe_r0 <= iCount;
                         addr_pipe_r1 <= addr_pipe_r0;
                         pipe_valid <= pipe_valid(0) & '1';
 
-                        -- Perform subtraction when BRAM data registers are valid (1-cycle latency)
+                        -- Perform add when BRAM data registers are valid (1-cycle latency)
                         IF pipe_valid(0) = '1' THEN
                             iWriteEnableC(0) <= '1';
                             iWriteDataC_s <= resize(signed(iReadDataA), 64) + resize(signed(iReadDataB), 64);

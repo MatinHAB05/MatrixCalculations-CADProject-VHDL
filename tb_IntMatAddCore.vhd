@@ -117,7 +117,7 @@ BEGIN
         WAIT UNTIL rising_edge(clk);
 
         -- Initialize verification headers
-        write(L_log, STRING'("=== MATRIX SUBTRACTION HARDWARE VERIFICATION LOG ==="));
+        write(L_log, STRING'("=== MATRIX ADD HARDWARE VERIFICATION LOG ==="));
         writeline(FLOG, L_log);
 
         re <= '1';
@@ -139,7 +139,7 @@ BEGIN
                 -- 2. Capture Core Output Data Stage
                 val_act := to_integer(signed(rdata));
 
-                -- 3. Update Clean Subtraction Matrix Output File
+                -- 3. Update Clean Add Matrix Output File
                 write(L, STRING'("C("));
                 write(L, row);
                 write(L, STRING'(","));
